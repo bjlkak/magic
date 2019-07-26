@@ -10,7 +10,7 @@ database:
   driverClass: org.postgresql.Driver
   user: postgres
   password: admin
-  url: jdbc:postgresql://localhost/magic
+  url: jdbc:postgresql://postgresql/postgres
   properties:
     charSet: UTF-8
 
