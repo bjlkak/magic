@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  postgresql:
+    image: postgres
+    container_name: postgres_magic
+    ports:
+       - "5432:5432"
+    environment:
+       - POSTGRES_DB=postgres
+       - POSTGRES_USER=postgres
+       - POSTGRES_PASSWORD=admin
+    networks:
+       - magic-ntw
+
+  magic:
+    image: openjdk:8
+    container_name: magic
+    command: ["java", "-jar", "blee-core-1.0.0.jar", "server", "config.yml"]
+    volumes:
+      - ./target/blee-core-1.0.0.jar:/data/blee-core-1.0.0.jar
+      - ./config.yml:/data/config.yml
+    working_dir: /data
+    ports:
+      - "8080:8080"
+    depends_on: 
+      - migration
+    links: 
+      - postgresql
+    networks:
+      - magic-ntw
+  
+  migration:
+    image: openjdk:8
+    container_name: migration
+    command: ["java", "-jar", "blee-core-1.0.0.jar", "db", "migrate", "config.yml"]
+    volumes:
+      - ./target/blee-core-1.0.0.jar:/data/blee-core-1.0.0.jar
+      - ./config.yml:/data/config.yml
+    working_dir: /data
+    links: 
+      - postgresql
+    depends_on:
+      - postgresql
+    networks:
+      - magic-ntw
+
+networks:
+  magic-ntw:
+    external:
+      name: magic-ntw
